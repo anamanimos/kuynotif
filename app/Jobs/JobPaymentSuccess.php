@@ -2,32 +2,27 @@
 
 namespace App\Jobs;
 
-use App\Mail\BookingAutoPay;
+use App\Mail\PaymentSuccess;
 use Illuminate\Bus\Queueable;
-use App\Mail\BookingManualPay;
+use App\Models\Send as ModelsSend;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
-use App\Models\Send as ModelsSend;
 
-class NewBooking implements ShouldQueue
+class JobPaymentSuccess implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-
-    public $data;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($data)
+    public function __construct()
     {
-        //
-        $this->data = $data;
         //
     }
 
@@ -39,31 +34,19 @@ class NewBooking implements ShouldQueue
     public function handle()
     {
         //
-
-        if ($this->data['type'] == 'manual') {
-            if (Mail::to($this->request['customer']['email'])->send(new BookingManualPay($this->data))) {
-                $mail = 'SENDED';
-                $mail_before = 1;
-            } else {
-                $mail = 'NOT SENDED';
-                $mail_before = 0;
-            }
-        } elseif ($this->data['type'] == 'auto') {
-            if (Mail::to($this->data['customer']['email'])->send(new BookingAutoPay($this->data))) {
-                $mail = 'SENDED';
-                $mail_before = 1;
-            } else {
-                $mail = 'NOT SENDED';
-                $mail_before = 0;
-            }
+        if (Mail::to($this->request['customer']['email'])->send(new PaymentSuccess($this->data))) {
+            $mail = 'SENDED';
+            $mail_after = 'yes';
+        } else {
+            $mail = 'NOT SENDED';
+            $mail_after = 'no';
         }
         $data_modif = $this->data;
 
         // Send callback
         $data_send = [
-            'invoice' => $data_modif['invoice'],
-            'mail_before' => $mail_before,
-            'mail_after' => 0
+            'invoice' => $this->data['invoice'],
+            'mail_after' => $mail_after
         ];
 
         $curl = curl_init();
@@ -76,7 +59,9 @@ class NewBooking implements ShouldQueue
             CURLOPT_FAILONERROR    => false,
             CURLOPT_POST           => true,
             CURLOPT_POSTFIELDS     => http_build_query($data_send),
-            CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4
+            CURLOPT_IPRESOLVE      => CURL_IPRESOLVE_V4,
+            CURLOPT_SSL_VERIFYHOST  => false,
+            CURLOPT_SSL_VERIFYPEER  => false,
         ]);
 
         $response = curl_exec($curl);
@@ -84,10 +69,9 @@ class NewBooking implements ShouldQueue
 
         curl_close($curl);
 
-
+        $data_modif['title'] = 'BOOKING - Payment Complete';
         $data_modif['mail_status'] = $mail;
         $send = new ModelsSend();
-        $send->telegramNewBooking($data_modif);
-        return $this->data;
+        $send->telegram($data_modif);
     }
 }

@@ -9,6 +9,50 @@ class Send extends Model
 {
     use HasFactory;
 
+    public static function telegram($data)
+    {
+        $message = $data['title'] . '
+    
+Name : ' . $data['customer']['full_name'] . '
+Email : ' . $data['customer']['email'] . '
+WhatsApp : ' . $data['customer']['whatsapp'] . '
+        
+Invoice :*' . $data['invoice'] . '*
+Booking Date : ' . $data['booking_date'] . '
+Time : ' .  $data['booking_time'] . '
+
+Payment Method : ' . $data['payment']['name'] . '
+Payment Status : ' . $data['payment']['status'] . '
+Mail status : ' . $data['mail_status'] . '
+            
+*Artspace Production*';
+
+        $send = new Send();
+        $send->telegram_text($message);
+    }
+
+    public static function telegramPaymentConfirm($data)
+    {
+        $message = $data['title'] . '
+    
+Name : ' . $data['customer']['full_name'] . '
+Email : ' . $data['customer']['email'] . '
+WhatsApp : ' . $data['customer']['whatsapp'] . '
+        
+Invoice :*' . $data['invoice'] . '*
+Booking Date : ' . $data['booking_date'] . '
+Time : ' .  $data['booking_time'] . '
+
+Payment Method : ' . $data['payment']['name'] . '
+Payment Status : ' . $data['payment']['status'] . '
+Mail status : ' . $data['mail_status'] . '
+            
+*Artspace Production*';
+
+        $send = new Send();
+        $send->telegram_attach($data['image_confirm'], $message);
+    }
+
     public static function telegramNewBooking($data)
     {
         $notif_option = '';
@@ -21,8 +65,8 @@ class Send extends Model
 Name : ' . $data['customer']['full_name'] . '
 Email : ' . $data['customer']['email'] . '
 WhatsApp : ' . $data['customer']['whatsapp'] . '
-Invoice :*' . $data['invoice'] . '*
 
+Invoice :*' . $data['invoice'] . '*
 Product : ' . $data['product_title'] . '
 Booking Date : ' . $data['booking_date'] . '
 Time : ' . $data['booking_time'] . '
