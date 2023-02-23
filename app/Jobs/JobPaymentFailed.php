@@ -16,15 +16,17 @@ use Illuminate\Contracts\Queue\ShouldBeUnique;
 class JobPaymentFailed implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    public $data;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
         //
+        $this->data = $data;
     }
 
     /**
@@ -35,7 +37,7 @@ class JobPaymentFailed implements ShouldQueue
     public function handle()
     {
         //
-        if (Mail::to($this->request['customer']['email'])->send(new PaymentFailed($this->data))) {
+        if (Mail::to($this->data['customer']['email'])->send(new PaymentFailed($this->data))) {
             $mail = 'SENDED';
             $mail_after = 'yes';
         } else {

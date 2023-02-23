@@ -15,15 +15,17 @@ use App\Models\Send as ModelsSend;
 class JobPaymentError implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    public $data;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
         //
+        $this->data = $data;
     }
 
     /**
@@ -34,7 +36,7 @@ class JobPaymentError implements ShouldQueue
     public function handle()
     {
         //
-        if (Mail::to($this->request['customer']['email'])->send(new PaymentError($this->data))) {
+        if (Mail::to($this->data['customer']['email'])->send(new PaymentError($this->data))) {
             $mail = 'SENDED';
             $mail_after = 'yes';
         } else {

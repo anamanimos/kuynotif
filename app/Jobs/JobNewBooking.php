@@ -41,7 +41,7 @@ class JobNewBooking implements ShouldQueue
         //
 
         if ($this->data['type'] == 'manual') {
-            if (Mail::to($this->request['customer']['email'])->send(new BookingManualPay($this->data))) {
+            if (Mail::to($this->data['customer']['email'])->send(new BookingManualPay($this->data))) {
                 $mail = 'SENDED';
                 $mail_before = 'yes';
             } else {

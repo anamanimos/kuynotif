@@ -50,7 +50,7 @@ Mail status : ' . $data['mail_status'] . '
 *Artspace Production*';
 
         $send = new Send();
-        $send->telegram_attach($data['image_confirm'], $message);
+        $send->telegram_attach($data['image'], $message);
     }
 
     public static function telegramNewBooking($data)
