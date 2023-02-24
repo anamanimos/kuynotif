@@ -2,9 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Mail\PaymentError;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -12,7 +10,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use App\Models\Send as ModelsSend;
 
-class JobPaymentError implements ShouldQueue
+class JobPaymentDecline implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
     public $data;
@@ -37,7 +35,7 @@ class JobPaymentError implements ShouldQueue
     {
         //
         $send = new ModelsSend();
-        $mailer = $send->mailer('paymenterror', $this->data);
+        $mailer = $send->mailer('paymentdecline', $this->data);
         if ($mailer['success'] == true) {
             $mail = 'SENDED';
             $mail_after = 'yes';
@@ -73,8 +71,13 @@ class JobPaymentError implements ShouldQueue
 
         curl_close($curl);
 
-        $data_modif['title'] = 'BOOKING - Payment Error';
+        $data_modif['title'] = 'BOOKING - Payment Decline';
         $data_modif['mail_status'] = $mail;
-        // $send->telegram($data_modif);
+        if ($send->telegram($data_modif)) {
+            $telegram_send = true;
+        } else {
+            $telegram_send = false;
+        };
+        echo json_encode(['email' => $mail, 'telegram' => $telegram_send]);
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class PaymentError extends Mailable
+class PaymentDecline extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -35,7 +35,7 @@ class PaymentError extends Mailable
     public function envelope()
     {
         return new Envelope(
-            subject: 'Booking - Pembayaran Gagal',
+            subject: 'Booking - Pembayaran ditolak',
         );
     }
 
@@ -47,7 +47,7 @@ class PaymentError extends Mailable
     public function content()
     {
         return new Content(
-            view: 'emails.payment-error',
+            view: 'emails.payment-decline',
         );
     }
 

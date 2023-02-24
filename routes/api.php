@@ -21,7 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/newbooking', [SendController::class, 'newBooking']);
 Route::post('/paymentconfirm', [SendController::class, 'paymentConfirm']);
 Route::post('/paymentsuccess', [SendController::class, 'paymentSuccess']);
-Route::post('/paymenterror', [SendController::class, 'paymentError']);
+Route::post('/paymentdecline', [SendController::class, 'paymentDecline']);
 Route::post('/paymentfailed', [SendController::class, 'paymentFailed']);
 Route::post('/paymentrefund', [SendController::class, 'paymentRefund']);
 Route::post('/paymentexpired', [SendController::class, 'paymentExpired']);

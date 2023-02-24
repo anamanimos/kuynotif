@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Mail\PaymentError;
 use App\Mail\PaymentFailed;
 use App\Mail\PaymentRefund;
 use App\Mail\BookingAutoPay;
@@ -10,6 +9,7 @@ use App\Mail\PaymentConfirm;
 use App\Mail\PaymentExpired;
 use App\Mail\PaymentSuccess;
 use App\Mail\BookingManualPay;
+use App\Mail\PaymentDecline;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
@@ -44,8 +44,8 @@ class Send extends Model
                 } else {
                     $send = false;
                 }
-            } elseif ($type == 'paymenterror') {
-                if (Mail::to($data['customer']['email'])->send(new PaymentError($data))) {
+            } elseif ($type == 'paymentdecline') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentDecline($data))) {
                     $send = true;
                 } else {
                     $send = false;
@@ -99,8 +99,8 @@ class Send extends Model
                 } else {
                     $send = false;
                 }
-            } elseif ($type == 'paymenterror') {
-                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentError($data))) {
+            } elseif ($type == 'paymentdecline') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentDecline($data))) {
                     $send = true;
                 } else {
                     $send = false;
@@ -140,7 +140,7 @@ class Send extends Model
     }
     public static function telegram($data)
     {
-        $message = $data['title'] . '
+        $message = '*' . $data['title'] . '*
     
 Name : ' . $data['customer']['full_name'] . '
 Email : ' . $data['customer']['email'] . '
@@ -162,7 +162,7 @@ Mail status : ' . $data['mail_status'] . '
 
     public static function telegramPaymentConfirm($data)
     {
-        $message = $data['title'] . '
+        $message = '*' . $data['title'] . '*
     
 Name : ' . $data['customer']['full_name'] . '
 Email : ' . $data['customer']['email'] . '
@@ -185,9 +185,11 @@ Mail status : ' . $data['mail_status'] . '
     public static function telegramNewBooking($data)
     {
         $notif_option = '';
-        foreach ($data['booking_option'] as $option) {
-            $notif_option .= $option['name'] . ' : ' . $option['value'] . '
+        if ($data['booking_option'] != '') {
+            foreach ($data['booking_option'] as $option) {
+                $notif_option .= $option['name'] . ' : ' . $option['value'] . '
 ';
+            }
         }
         $message = '*NEW BOOKING*
     
@@ -199,7 +201,6 @@ Invoice :*' . $data['invoice'] . '*
 Product : ' . $data['product_title'] . '
 Booking Date : ' . $data['booking_date'] . '
 Time : ' . $data['booking_time'] . '
-
 ' . $notif_option . '
 Payment Method : ' . $data['payment']['name'] . '
 Payment Status : ' . $data['payment']['status'] . '

@@ -75,7 +75,13 @@ class JobPaymentFailed implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Payment Failed';
         $data_modif['mail_status'] = $mail;
-        $send = new ModelsSend();
-        $send->telegram($data_modif);
+
+        if ($send->telegram($data_modif)) {
+            $telegram_send = true;
+        } else {
+            $telegram_send = false;
+        };
+
+        echo json_encode(['email' => $mail, 'telegram' => $telegram_send]);
     }
 }

@@ -12,18 +12,19 @@
     Halo {{$data['customer']['full_name']}},<br/>   
     Booking {{$data['product_title']}} berhasil. Detail Booking:<br/><br/>
 
-    Nomor Invoice {{$data['invoice']}}<br/><br/>
+    Nomor Invoice <strong>{{$data['invoice']}}</strong><br/><br/>
     Nama : {{$data['customer']['full_name']}}<br/>
     Email : {{$data['customer']['email']}}<br/>
     WhatsApp :{{$data['customer']['whatsapp']}}<br/><br/>
 
     Hari, Tanggal : {{$data['booking_date']}}<br/>
-    Waktu : {{$data['booking_date']}}<br/>
+    Waktu : {{$data['booking_date']}}<br/><br/>
     
-    @foreach ($data['booking_option'] as $option)
-        {{$option['name']}} : {{$option['value']}}<br/>
-    @endforeach
-
+    <?php if($data['booking_option'] != ''){ ?>
+        @foreach ($data['booking_option'] as $option)
+            {{$option['name']}} : {{$option['value']}}<br/>
+        @endforeach
+    <?php } ?>
     <br/><br/>
 
     Jumlah harus dibayarkan:{{$data['total_payment']}}<br/><br/>

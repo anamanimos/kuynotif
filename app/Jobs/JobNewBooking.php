@@ -76,7 +76,12 @@ class JobNewBooking implements ShouldQueue
         curl_close($curl);
 
         $data_modif['mail_status'] = $mail;
+        if ($send->telegramNewBooking($data_modif)) {
+            $telegram_send = true;
+        } else {
+            $telegram_send = false;
+        };
 
-        $send->telegramNewBooking($data_modif);
+        echo json_encode(['email' => $mail, 'telegram' => $telegram_send]);
     }
 }

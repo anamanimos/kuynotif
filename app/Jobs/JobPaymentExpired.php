@@ -74,6 +74,13 @@ class JobPaymentExpired implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Payment Expired';
         $data_modif['mail_status'] = $mail;
-        $send->telegram($data_modif);
+
+        if ($send->telegram($data_modif)) {
+            $telegram_send = true;
+        } else {
+            $telegram_send = false;
+        };
+
+        echo json_encode(['email' => $mail, 'telegram' => $telegram_send]);
     }
 }

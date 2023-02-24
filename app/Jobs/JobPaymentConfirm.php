@@ -46,6 +46,13 @@ class JobPaymentConfirm implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Konfirmasi Pembayaran diterima';
         $data_modif['mail_status'] = $mail;
-        $send->telegramPaymentConfirm($data_modif);
+
+        if ($send->telegramPaymentConfirm($data_modif)) {
+            $telegram_send = true;
+        } else {
+            $telegram_send = false;
+        };
+
+        echo json_encode(['email' => $mail, 'telegram' => $telegram_send]);
     }
 }

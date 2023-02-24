@@ -18,12 +18,13 @@
     WhatsApp :{{$data['customer']['whatsapp']}}<br/><br/>
 
     Hari, Tanggal : {{$data['booking_date']}}<br/>
-    Waktu : {{$data['booking_date']}}<br/>
+    Waktu : {{$data['booking_date']}}<br/><br/>
     
-    @foreach ($data['booking_option'] as $option)
-        {{$option['name']}} : {{$option['value']}}<br/>
-    @endforeach
-
+    <?php if($data['booking_option'] != ''){ ?>
+        @foreach ($data['booking_option'] as $option)
+            {{$option['name']}} : {{$option['value']}}<br/>
+        @endforeach
+    <?php } ?>
     <br/><br/>
 
     Jumlah harus dibayarkan:{{$data['total_payment']}}<br/><br/>

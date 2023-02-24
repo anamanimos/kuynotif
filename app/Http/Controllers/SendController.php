@@ -4,11 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Jobs\JobNewBooking;
 use Illuminate\Http\Request;
-use App\Jobs\JobPaymentConfirm;
-use App\Jobs\JobPaymentError;
-use App\Jobs\JobPaymentExpired;
 use App\Jobs\JobPaymentFailed;
 use App\Jobs\JobPaymentRefund;
+use App\Jobs\JobPaymentConfirm;
+use App\Jobs\JobPaymentDecline;
+use App\Jobs\JobPaymentExpired;
 use App\Jobs\JobPaymentSuccess;
 
 class SendController extends Controller
@@ -31,10 +31,10 @@ class SendController extends Controller
         JobPaymentSuccess::dispatch($data);
     }
 
-    public function paymentError(Request $request)
+    public function paymentDecline(Request $request)
     {
         $data = $request->all();
-        JobPaymentError::dispatch($data);
+        JobPaymentDecline::dispatch($data);
     }
 
     public function paymentFailed(Request $request)
