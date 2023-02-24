@@ -36,8 +36,9 @@ class JobPaymentFailed implements ShouldQueue
      */
     public function handle()
     {
-        //
-        if (Mail::to($this->data['customer']['email'])->send(new PaymentFailed($this->data))) {
+        $send = new ModelsSend();
+        $mailer = $send->mailer('paymentfailed', $this->data);
+        if ($mailer['success'] == true) {
             $mail = 'SENDED';
             $mail_after = 'yes';
         } else {

@@ -38,24 +38,14 @@ class JobNewBooking implements ShouldQueue
      */
     public function handle()
     {
-        //
-
-        if ($this->data['type'] == 'manual') {
-            if (Mail::to($this->data['customer']['email'])->send(new BookingManualPay($this->data))) {
-                $mail = 'SENDED';
-                $mail_before = 'yes';
-            } else {
-                $mail = 'NOT SENDED';
-                $mail_before = 'no';
-            }
-        } elseif ($this->data['type'] == 'auto') {
-            if (Mail::to($this->data['customer']['email'])->send(new BookingAutoPay($this->data))) {
-                $mail = 'SENDED';
-                $mail_before = 'yes';
-            } else {
-                $mail = 'NOT SENDED';
-                $mail_before = 'no';
-            }
+        $send = new ModelsSend();
+        $mailer = $send->mailer('newbooking', $this->data);
+        if ($mailer['success'] == true) {
+            $mail = 'SENDED';
+            $mail_before = 'yes';
+        } else {
+            $mail = 'NOT SENDED';
+            $mail_before = 'no';
         }
         $data_modif = $this->data;
 
@@ -86,7 +76,7 @@ class JobNewBooking implements ShouldQueue
         curl_close($curl);
 
         $data_modif['mail_status'] = $mail;
-        $send = new ModelsSend();
+
         $send->telegramNewBooking($data_modif);
     }
 }

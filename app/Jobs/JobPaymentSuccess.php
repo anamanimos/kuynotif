@@ -36,7 +36,9 @@ class JobPaymentSuccess implements ShouldQueue
     public function handle()
     {
         //
-        if (Mail::to($this->data['customer']['email'])->send(new PaymentSuccess($this->data))) {
+        $send = new ModelsSend();
+        $mailer = $send->mailer('paymentsuccess', $this->data);
+        if ($mailer['success'] == true) {
             $mail = 'SENDED';
             $mail_after = 'yes';
         } else {
@@ -73,7 +75,6 @@ class JobPaymentSuccess implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Payment Complete';
         $data_modif['mail_status'] = $mail;
-        $send = new ModelsSend();
         $send->telegram($data_modif);
     }
 }

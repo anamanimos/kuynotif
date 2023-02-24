@@ -2,13 +2,142 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Mail\PaymentError;
+use App\Mail\PaymentFailed;
+use App\Mail\PaymentRefund;
+use App\Mail\BookingAutoPay;
+use App\Mail\PaymentConfirm;
+use App\Mail\PaymentExpired;
+use App\Mail\PaymentSuccess;
+use App\Mail\BookingManualPay;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Send extends Model
 {
     use HasFactory;
 
+    public static function mailer($type, $data)
+    {
+        $router = DB::table('settings')->where('name', 'email_router')->value('value');
+        if ($router == 0) {
+            $new_value = 1;
+            if ($type == 'newbooking') {
+                if ($data['type'] == 'manual') {
+                    if (Mail::to($data['customer']['email'])->send(new BookingManualPay($data))) {
+                        $send = true;
+                    } else {
+                        $send = false;
+                    }
+                } elseif ($data['type'] == 'auto') {
+                    if (Mail::to($data['customer']['email'])->send(new BookingAutoPay($data))) {
+                        $send = true;
+                    } else {
+                        $send = false;
+                    }
+                }
+            } elseif ($type == 'paymentconfirm') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentConfirm($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymenterror') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentError($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentexpired') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentExpired($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentfailed') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentFailed($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentrefund') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentRefund($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentsuccess') {
+                if (Mail::to($data['customer']['email'])->send(new PaymentSuccess($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } else {
+                $send = false;
+            }
+        } else {
+            $new_value = 0;
+            if ($type == 'newbooking') {
+                if ($data['type'] == 'manual') {
+                    if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new BookingManualPay($data))) {
+                        $send = true;
+                    } else {
+                        $send = false;
+                    }
+                } elseif ($data['type'] == 'auto') {
+                    if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new BookingAutoPay($data))) {
+                        $send = true;
+                    } else {
+                        $send = false;
+                    }
+                }
+            } elseif ($type == 'paymentconfirm') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentConfirm($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymenterror') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentError($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentexpired') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentExpired($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentfailed') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentFailed($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentrefund') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentRefund($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } elseif ($type == 'paymentsuccess') {
+                if (Mail::mailer('smtp2')->to($data['customer']['email'])->send(new PaymentSuccess($data))) {
+                    $send = true;
+                } else {
+                    $send = false;
+                }
+            } else {
+                $send = false;
+            }
+        }
+        // update
+        DB::table('settings')->where('name', 'email_router')->update(['value' => $new_value, 'updated_at' => date("Y-m-d H:i:s")]);
+
+        return ['success' => $send];
+    }
     public static function telegram($data)
     {
         $message = $data['title'] . '

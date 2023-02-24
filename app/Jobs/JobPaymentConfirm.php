@@ -35,8 +35,9 @@ class JobPaymentConfirm implements ShouldQueue
      */
     public function handle()
     {
-        //
-        if (Mail::to($this->data['customer']['email'])->send(new PaymentConfirm($this->data))) {
+        $send = new ModelsSend();
+        $mailer = $send->mailer('paymentconfirm', $this->data);
+        if ($mailer['success'] == true) {
             $mail = 'SENDED';
         } else {
             $mail = 'NOT SENDED';
@@ -45,7 +46,6 @@ class JobPaymentConfirm implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Konfirmasi Pembayaran diterima';
         $data_modif['mail_status'] = $mail;
-        $send = new ModelsSend();
         $send->telegramPaymentConfirm($data_modif);
     }
 }

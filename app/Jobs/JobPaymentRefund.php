@@ -36,7 +36,9 @@ class JobPaymentRefund implements ShouldQueue
     public function handle()
     {
         //
-        if (Mail::to($this->data['customer']['email'])->send(new PaymentRefund($this->data))) {
+        $send = new ModelsSend();
+        $mailer = $send->mailer('paymentrefund', $this->data);
+        if ($mailer['success'] == true) {
             $mail = 'SENDED';
             $mail_after = 'yes';
         } else {
@@ -73,7 +75,6 @@ class JobPaymentRefund implements ShouldQueue
 
         $data_modif['title'] = 'BOOKING - Payment Refund';
         $data_modif['mail_status'] = $mail;
-        $send = new ModelsSend();
         $send->telegram($data_modif);
     }
 }
