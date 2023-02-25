@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('http://kuystudio.id');
 });
 Route::get('/test', function () {
     $router = DB::table('settings')->where('name', 'email_router')->value('value');

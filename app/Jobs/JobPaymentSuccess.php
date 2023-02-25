@@ -57,7 +57,7 @@ class JobPaymentSuccess implements ShouldQueue
 
         curl_setopt_array($curl, [
             CURLOPT_FRESH_CONNECT  => true,
-            CURLOPT_URL            => 'https://dev-app.kuystudio.test/api/callback/notif',
+            CURLOPT_URL            => env('CALLBACK_URL', 'https://dev-app.kuystudio.test/api/callback/notif'),
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_HEADER         => false,
             CURLOPT_FAILONERROR    => false,
